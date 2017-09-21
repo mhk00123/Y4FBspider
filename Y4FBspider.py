@@ -10,10 +10,10 @@ import csv
 group_id = '277631202754911'
 token = 'EAACEdEose0cBAF0rygdNLAqpsGz7mR2bDspDtpHsbaHELpBBwLKbfaB0uZBmOGJev9tQtwX61bEXhQkW8SPHPVY3ZByZAaOmoNYgTG5GfOlFpUpuojZBke6BXQQ2SaHJGNWUvdfofq2UqFIY6QRj2vf29THMKARHsWoXSK1wNYfEmvzCGLDckgyZCxJ352ZCPZBhc07Do9EKwZDZD'
 #Get Requests
+
 res = requests.get('https://graph.facebook.com/v2.4/{}/feed?access_token={}'.format(group_id, token))
-
-
-
+	
+#weather_data = requests.get('http://www.airq.org.tw/Home/GetCurrentValueApi?station={}&sensor={}'.format())
 
 local_time = time.strftime("%Y-%m-%d_%H:%M:%S", time.localtime())
 #print(local_time)
