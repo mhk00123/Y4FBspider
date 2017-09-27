@@ -78,7 +78,7 @@ url_lst = []                    #useful url list
 lat_lst = []                    #useful latitude list
 lon_lst = []                    #useful longitude list
 note_lst = []                   #useful note list
-error_id_lst = []                  #useful error list
+error_id_lst = []               #useful error list
 
 #Get all useful info
 urlService()
@@ -96,7 +96,7 @@ db=DBService()
 #db.createSiteData(id_lst,lat_lst,lon_lst,note_lst)
 
 timeStr = time.strftime('%Y_%m_%d_%H_%M')                           #get current time
-db.createAirData(timeStr,id_lst,pm25_lst,pm10_lst,t_lst,h_lst)      #Create AriInfo table
+db.createAirData(timeStr,id_lst,lat_lst,lon_lst,pm25_lst,pm10_lst,t_lst,h_lst)      #Create AriInfo table
 data = db.ReadAirData(timeStr)
 
 for item in data:

@@ -23,11 +23,13 @@ class DBService:
         connection.commit()
         connection.close()
         
-    def createAirData(self,timeStr,id_lst,pm25_lst,pm10_lst,t_lst,h_lst):
+    def createAirData(self,timeStr,id_lst,lat_lst,lon_lst,pm25_lst,pm10_lst,t_lst,h_lst):
         self.timeStr = timeStr
         connection = sqlite3.connect('PM25.sqlite')
         sqlStr = """CREATE TABLE AirInfo_{} 
                     (stId VARCHAR NOT NULL,
+                    Latitude FLOAT,
+                    Longitude FLOAT,
                     PM25 INTEGER,
                     PM10 INTEGER,
                     Temperature FLOAT,
@@ -38,8 +40,8 @@ class DBService:
         connection.commit()
         
         for i in range(0,len(id_lst)):
-            sqlStr = "INSERT INTO AirInfo_{} VALUES('{}',{},{},{},{})".format(
-                    self.timeStr,id_lst[i],pm25_lst[i],pm10_lst[i],t_lst[i],h_lst[i])
+            sqlStr = "INSERT INTO AirInfo_{} VALUES('{}',{},{},{},{},{},{})".format(
+                    self.timeStr,id_lst[i],lat_lst[i],lon_lst[i],pm25_lst[i],pm10_lst[i],t_lst[i],h_lst[i])
             connection.execute(sqlStr)
         connection.commit()
         connection.close()
@@ -47,7 +49,7 @@ class DBService:
     def ReadAirData(self,timeStr):
         
         connection = sqlite3.connect('PM25.sqlite')
-        sqlStr = "select * from AirInfo_{}".format(timeStr)
+        sqlStr = "select * from AirInfo_{} ORDER BY Latitude ASC, Longitude ASC".format(timeStr)
         cursor = connection.cursor()
         cursor.execute(sqlStr)
         data = cursor.fetchall()
