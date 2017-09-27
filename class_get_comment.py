@@ -1,72 +1,58 @@
-#Define main function
+import facebook
 
-import urllib
-import json
-import requests
-import pandas as pd 
-from dateutil.parser import parse
+class g_inf:
+	token = 'EAACEdEose0cBAKRWQnAgxyH79gx2VZCee91pE0XWdOzXtxGoXbVNDMna0kGtIbZAGVv1te1fwgYrCc8Uznfm9IBOO8yadhzy8j4qv4xtUQcTiTZC29iwC9bwet35BghVPPPg10pZAvmZAAZBb0JwUReho1ZBc9MBCmZCW2TDfPUIvY3DMJaWZCgVFFblKnLYp9VoZD'
+	page_id = '277631202754911'
 
-#global Var
-page_id = '277631202754911'
-token = 'EAACEdEose0cBAIzsYZBZAShVMNiZAUhk2GZBqQ9BS2SlavWzJCW2KviVweVjO6oR4nqfdjZBrgyXJcNL7Y2r19mQCgEyTMCIqhRUXB9pZAsPS6ZCzl8z5l6uqofo8BzWbLFqXqW7krZA1WUDJdtEfNQRZA0TgOVZCBNQMc9PKluakgZCADIaEIKgPvnTuCcE3MvPvZBPtxSr9PVZCsgZDZD'
-fb_api = 'https://graph.facebook.com/v2.4/'
+	graph = facebook.GraphAPI(access_token = token)
+	me_info = graph.get_object('allenabcde')
 
-#global get list
-information_list = []
-g_id = []
-g_comments = []
+	#/--------------------------------取得所有留言--------------------------------/#
+	def get_all_posts(self, action='posts'):
+		all_posts = []
+		posts = self.graph.get_connections(id = self.page_id, connection_name = action)
+		for each in posts['data']:
+			if 'message' in each:
+				all_posts.append(each['message'])
+				#print(all_posts)
+		return all_posts
+	#/--------------------------------取得所有留言ID--------------------------------/#
+	def get_all_posts_id(self, action='posts'):
+		all_posts_id = []
+		posts = self.graph.get_connections(id = self.page_id, connection_name = action)
+		for each in posts['data']:
+			if 'message' in each:
+				all_posts_id.append(each['id'])
+		return all_posts_id
 
-#fb cm data
-All_posts = []
-All_comments = []
-post_usr = []
-comments_usr = []
-post_time = []
-comments_time = []
+	#/--------------------------------透過ID取得該筆留POST內容--------------------------------/#
+	def get_own_posts_message(self,g_id):
+		post = self.graph.get_object(id=g_id, fields='message')
+		return post['message']
 
-
-class Get_fb_data:
-	"""docstring for get_fb_data"""
-	def __init__(self):
-		pass
-
-	def get_id(self):
-		r_url = fb_api+page_id+'?fields=posts&access_token='+token
-		res = requests.get(r_url)
-		for i in res.json()['posts']['data']:
-			if 'message' in i:
-				g_id.append(i['id'])
-		return g_id
-
-	def get_post(self,id):
-		r_url = fb_api+id+'?access_token='+token
-		res = requests.get(r_url)
-		All_posts.append(res.json()['message'])
-		return res.json()['message']
-
-	def get_comment(self,id):
-		All_comments.clear()
-		comments_usr.clear()
-		comments_time.clear()
-		
-		r_url = fb_api+id+'?fields=comments&access_token='+token
-		res = requests.get(r_url)
-		#return r_url
-
-		#All_posts.append(self.get_post(res.json()['id']))
-		if 'comments' in res.json():
-			for i in res.json()['comments']['data']:
-				All_comments.append(i['message'])
-				comments_usr.append(i['from']['name'])
+	#/--------------------------------透過ID取得該筆POST所有留言--------------------------------/#
+	def get_comments(self, post_id, action='comments'):
+		all_comments = []
+		cm_from = []
+		cm = self.graph.get_object(id=post_id,fields='comments')
+		if 'comments' in cm:
+			for each in cm['comments']['data']:
+				if 'message' in each:
+					all_comments.append(each['message'])
 		else:
-			All_comments.append("沒有留言")
-		return All_comments
+			all_comments.append("No comments!!!!")
+		return all_comments
 
-
-
-"""#Test
-if __name__ == '__main__':
-	e = Get_fb_data()
-	e.get_post(g_id[2])
-	print(g_id)
-	#print(All_posts)"""
+	#/--------------------------------回傳UserName--------------------------------/#
+	def get_user(self, post_id):
+		cm_from = []
+		cm = self.graph.get_object(id=post_id,fields='comments')
+		if 'comments' in cm:
+			for each in cm['comments']['data']:
+					cm_from.append(each['from']['name'])
+		else:
+			cm_from.append("No one")
+		return cm_from
+	#/--------------------------------發文--------------------------------/#
+	def post_to_page(self,p_str):
+		self.graph.put_object(self.page_id, "feed", message=p_str)
