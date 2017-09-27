@@ -3,7 +3,7 @@ import class_get_comment
 
 window = tk.Tk()
 window.title('留言捉取')
-window.geometry('400x300')
+window.geometry('380x300')
 x = class_get_comment.g_inf()
 
 a_p_id = []
@@ -44,11 +44,21 @@ check_btn = tk.Button(window,text='Get it',width=19,command=get_inf)
 check_btn.place(x=0,y=190)
 
 
-post_id_text = tk.Entry(window,width=45)
+post_id_text = tk.Entry(window,width=32)
 post_id_text.place(x=145,y=0)
 
-post_cm_text = tk.Text(window,width=35, bd=2, font='微軟正黑體')
+post_cm_text = tk.Text(window,width=25, bd=2, font='微軟正黑體')
 post_cm_text.place(x=145,y=22)
 
+def post_message():
+	str1 = post_cm_text.get(0.0,'end')
+	x.post_to_page(str1)
+	#print(str1)
+	post_id_text.delete(0, 'end')
+	post_cm_text.delete(0.0, 'end')
+	post_cm_text.insert(1.0,'Po文完成!!\n-------------------------------\n')
+	post_id_text.insert('0',x.get_all_posts_id()[0])
 
+btn_post_btn = tk.Button(window,width=19,text='Post it',command=post_message)
+btn_post_btn.place(x=0,y=230)
 window.mainloop()

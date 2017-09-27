@@ -1,7 +1,7 @@
 import facebook
 
 class g_inf:
-	token = 'EAACEdEose0cBAKRWQnAgxyH79gx2VZCee91pE0XWdOzXtxGoXbVNDMna0kGtIbZAGVv1te1fwgYrCc8Uznfm9IBOO8yadhzy8j4qv4xtUQcTiTZC29iwC9bwet35BghVPPPg10pZAvmZAAZBb0JwUReho1ZBc9MBCmZCW2TDfPUIvY3DMJaWZCgVFFblKnLYp9VoZD'
+	token = 'EAACEdEose0cBAFjF8IgYuxtM7C7esuP62bz0vncUODiDnqZA3KE7oDumD7d21O78biZCh6CpSKQBpsaz6hTw5cZCre7FGEBWdjGUqh7fn4yIFJkXzSY4h4LQQFnKwfNXE15XAHW1yw0FRVKFviMZCQfgygvN54wfgKoTrTN1rrC9WCSm9ekqbxGMfZApZBcboZD'
 	page_id = '277631202754911'
 
 	graph = facebook.GraphAPI(access_token = token)
