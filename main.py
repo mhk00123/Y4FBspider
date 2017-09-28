@@ -24,7 +24,7 @@ def urlService():
             
             #remove invalid id
             if str(parse.find('title')).find('錯誤') != -1:
-                error_id_lst.append(Id)
+                continue
             else:
                 url_lst.append(url)
                 id_lst.append(Id)
@@ -78,7 +78,6 @@ url_lst = []                    #useful url list
 lat_lst = []                    #useful latitude list
 lon_lst = []                    #useful longitude list
 note_lst = []                   #useful note list
-error_id_lst = []               #useful error list
 
 #Get all useful info
 urlService()
@@ -90,16 +89,18 @@ pm10_lst = []                   #pm10 list
 t_lst = []                      #temperatuer lsit
 h_lst = []                      #humidity list
 getAirValue()                   #get all air value
-
+ 
 #database instance
 db=DBService()
 #db.createSiteData(id_lst,lat_lst,lon_lst,note_lst)
 
 timeStr = time.strftime('%Y_%m_%d_%H_%M')                           #get current time
-db.createAirData(timeStr,id_lst,lat_lst,lon_lst,pm25_lst,pm10_lst,t_lst,h_lst)      #Create AriInfo table
-data = db.ReadAirData(timeStr)
+db.createAirData(timeStr,id_lst,pm25_lst,pm10_lst,t_lst,h_lst)      #Create AriInfo table
+data = db.readAirData(timeStr)                                      #Read AriInfo table
 
 for item in data:
-    print(item[0],item[1],item[2],item[3],item[4])
-#excel.outputExcel(id_lst,note_lst,pm25_lst,pm10_lst,t_lst,h_lst)
+    print("%s  %3d  %3d  %3.2f  %3.2f  %3.9f  %3.9f  %s"
+          %(item[0],item[1],item[2],item[3],item[4],item[5],item[6],item[7]))
 
+
+#excel.outputExcel(id_lst,note_lst,pm25_lst,pm10_lst,t_lst,h_lst)

@@ -23,38 +23,36 @@ class DBService:
         connection.commit()
         connection.close()
         
-    def createAirData(self,timeStr,id_lst,lat_lst,lon_lst,pm25_lst,pm10_lst,t_lst,h_lst):
-        self.timeStr = timeStr
+    def createAirData(self,timeStr,id_lst,pm25_lst,pm10_lst,t_lst,h_lst):
         connection = sqlite3.connect('PM25.sqlite')
         sqlStr = """CREATE TABLE AirInfo_{} 
                     (stId VARCHAR NOT NULL,
-                    Latitude FLOAT,
-                    Longitude FLOAT,
                     PM25 INTEGER,
                     PM10 INTEGER,
-                    Temperature FLOAT,
-                    Humidity FLOAT,
+                    Temperature DOUBLE,
+                    Humidity DOUBLE,
                     PRIMARY KEY(stId),
-                    FOREIGN KEY(stId) REFERENCES SiteInfo(stId))""".format(self.timeStr)
+                    FOREIGN KEY(stId) REFERENCES SiteInfo(stId))""".format(timeStr)
         connection.execute(sqlStr)
         connection.commit()
         
         for i in range(0,len(id_lst)):
-            sqlStr = "INSERT INTO AirInfo_{} VALUES('{}',{},{},{},{},{},{})".format(
-                    self.timeStr,id_lst[i],lat_lst[i],lon_lst[i],pm25_lst[i],pm10_lst[i],t_lst[i],h_lst[i])
+            sqlStr = "INSERT INTO AirInfo_{} VALUES('{}',{},{},{},{})".format(
+                    timeStr,id_lst[i],pm25_lst[i],pm10_lst[i],t_lst[i],h_lst[i])
             connection.execute(sqlStr)
         connection.commit()
         connection.close()
     
-    def ReadAirData(self,timeStr):
-        
+    def readAirData(self,timeStr):
         connection = sqlite3.connect('PM25.sqlite')
-        sqlStr = "select * from AirInfo_{} ORDER BY Latitude ASC, Longitude ASC".format(timeStr)
-        cursor = connection.cursor()
-        cursor.execute(sqlStr)
-        data = cursor.fetchall()
+        queryStr="""SELECT AirInfo_{}.*, SiteInfo.stLatitude,
+                    SiteInfo.stLongitude, SiteInfo.stNote 
+                    FROM AirInfo_{}, SiteInfo 
+                    WHERE SiteInfo.stId = AirInfo_{}.stId
+                    ORDER BY SiteInfo.stLatitude ASC, SiteInfo.stLongitude ASC""".format(
+                    timeStr,timeStr,timeStr)
+                    
+        cursor = connection.execute(queryStr)
+        result = cursor.fetchall()
         
-        return data
-        
-        
-        
+        return result
