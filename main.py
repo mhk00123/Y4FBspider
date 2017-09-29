@@ -64,7 +64,7 @@ def getAirValue():
             h_lst.append(float(tempStr[:-3]))
 
 #==============================Main Programe===============================#
-
+'''
 #get all cols data from excel 
 excel = Service()
 all_id_lst = excel.getId()      #stId       
@@ -99,13 +99,19 @@ db=DBService()
 
 timeStr = time.strftime('%Y_%m_%d_%H_%M')                           #get current time
 db.createAirData(timeStr,id_lst,pm25_lst,pm10_lst,t_lst,h_lst)      #Create AriInfo table
-data = db.readAllAirData(timeStr)                                      #Read AriInfo table
-
-
+data = db.readAllAirData(timeStr)                                   #Read AriInfo table
+'''
 #data analy instance
 analy = dataAnaly()
-analy.getAreaData(timeStr)
-x,y = analy.getAreaAirInfo(timeStr)        
+analy.getAreaData('2017_09_29_18_50')           #get near area 
+analy.getAreaAirInfo('2017_09_29_18_50')        #get near area air information
 
+analy.s_PM25()                                  #cal near area air PM25 標準差 
+analy.s_PM10()                                  #cal near area air PM10 標準差
+analy.avg_PM25()                                #cal near area average PM25
+analy.avg_PM10()                                #cal near area average PM10
+x = analy.grubbsTest()                          #cal final value
 
+for item in x:
+    print(item)
 #excel.outputExcel(id_lst,note_lst,pm25_lst,pm10_lst,t_lst,h_lst)

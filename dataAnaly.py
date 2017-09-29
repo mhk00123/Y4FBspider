@@ -1,4 +1,5 @@
 from DBService import DBService
+import numpy as np
 
 class dataAnaly:
     
@@ -6,14 +7,14 @@ class dataAnaly:
     def getAreaData(self,timeStr):
         self.db = DBService()
         gps = []
-        self.neighbor_gps = []
+        self.area_gps = []
         
         r_data = self.db.readAllAirData(timeStr)
         
         for item in r_data:
             gps.append([item[0],item[5],item[6]])
         
-        #cal neighbor point
+        #cal area point
         for i in gps:
             temp = []
             temp.append(i[0])
@@ -23,14 +24,14 @@ class dataAnaly:
                     if abs(i[2]-j[2]) <= 0.1  and abs(i[2]-j[2]) > 0:
                         temp.append(j[0])
                         
-            self.neighbor_gps.append(temp)
+            self.area_gps.append(temp)
         #return self.neighbor_gps
     
     def getAreaAirInfo(self,timeStr):
          
-        self.neighbor_pm25 = []
-        self.neighbor_pm10 = []
-        for item in self.neighbor_gps:
+        self.area_pm25 = []
+        self.area_pm10 = []
+        for item in self.area_gps:
             temp25 = []
             temp10 = []
             for i in item:
@@ -38,8 +39,53 @@ class dataAnaly:
                 temp25.append(r_data[0][0])
                 temp10.append(r_data[0][1])
                 
-            self.neighbor_pm25.append(temp25)
-            self.neighbor_pm10.append(temp10)
+            self.area_pm25.append(temp25)
+            self.area_pm10.append(temp10)
         
-        print(type(r_data))
-        return self.neighbor_pm25,self.neighbor_pm10
+        #return self.neighbor_pm25,self.neighbor_pm10
+    
+    #PM25 標準差
+    def s_PM25(self):
+        self.s_pm25_lst = []
+        for item in self.area_pm25:
+            self.s_pm25_lst.append(np.std(item))
+    
+    #PM10 標準差
+    def s_PM10(self):
+        self.s_pm10_lst = []
+        for item in self.area_pm10:
+            self.s_pm10_lst.append(np.std(item))
+    
+    #PM25 Average
+    def avg_PM25(self):
+        self.avg_pm25_lst = []
+        for item in self.area_pm25:
+            self.avg_pm25_lst.append(np.mean(item))
+    
+    #PM10 Average    
+    def avg_PM10(self):
+        self.avg_pm10_lst = []
+        for item in self.area_pm10:
+            self.avg_pm10_lst.append(np.mean(item))
+    
+    #cal grubbsTest value         
+    def grubbsTest(self):
+        
+        self.area_final = []
+        for item in self.area_pm25:
+            count = 0
+            temp_area_gn = []
+            An = self.db.selectGAlpha(len(item))
+            x = str(An)[2:-3]
+            if(x == ''):
+                x = float(0)
+            else:
+                x = float(x)
+            for i in item:
+                Gn = abs((i - self.avg_pm25_lst[count])/self.s_pm25_lst[count])
+                final = Gn - x
+                temp_area_gn.append(final)
+            count += 1
+            self.area_final.append(temp_area_gn)
+            
+        return self.area_final

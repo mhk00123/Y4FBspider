@@ -70,5 +70,11 @@ class DBService:
         r_data = cursor.fetchall()
         
         return r_data
-        
     
+    #select Ga    
+    def selectGAlpha(self,n):
+        queryStr = 'select GrubbsTValue.alpha from GrubbsTValue where N = {}'.format(n)
+        connection = sqlite3.connect('PM25.sqlite')
+        cursor = connection.execute(queryStr)
+        
+        return cursor.fetchall()
