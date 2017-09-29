@@ -9,6 +9,7 @@ Created on Sun Sep 24 17:06:34 2017
 from excelService import Service        #excel class
 from DBService import DBService         #DB class
 from bs4 import BeautifulSoup as bs     #html parse package
+from dataAnaly import dataAnaly         #data analy package
 import requests,time                    #html package , time package
 
 #=================================Method===================================#
@@ -23,7 +24,8 @@ def urlService():
             parse = bs(html,'html.parser')
             
             #remove invalid id
-            if str(parse.find('title')).find('錯誤') != -1:
+            if str(parse.find('title')).find('錯誤') == 7:
+                error_id_lst.append(Id)
                 continue
             else:
                 url_lst.append(url)
@@ -73,6 +75,7 @@ all_note_lst = excel.getNote()  #stNote
 #sensor list
 sensor_lst = ['pm2.5','pm10','temperature','humidity']
 
+error_id_lst = []               #error id list
 id_lst = []                     #useful stId list
 url_lst = []                    #useful url list
 lat_lst = []                    #useful latitude list
@@ -96,11 +99,15 @@ db=DBService()
 
 timeStr = time.strftime('%Y_%m_%d_%H_%M')                           #get current time
 db.createAirData(timeStr,id_lst,pm25_lst,pm10_lst,t_lst,h_lst)      #Create AriInfo table
-data = db.readAirData(timeStr)                                      #Read AriInfo table
+data = db.readAllAirData(timeStr)                                      #Read AriInfo table
 
-for item in data:
-    print("%s  %3d  %3d  %3.2f  %3.2f  %3.9f  %3.9f  %s"
-          %(item[0],item[1],item[2],item[3],item[4],item[5],item[6],item[7]))
+#data analy instance
+analy = dataAnaly()
+analy.getAreaData(timeStr)
+x = analy.getAreaAirInfo(timeStr)
 
+for item in x:
+    print(item)
 
+#analy.getAreaAirInfo(timeStr)
 #excel.outputExcel(id_lst,note_lst,pm25_lst,pm10_lst,t_lst,h_lst)

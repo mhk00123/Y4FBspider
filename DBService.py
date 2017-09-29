@@ -43,7 +43,10 @@ class DBService:
         connection.commit()
         connection.close()
     
-    def readAirData(self,timeStr):
+    #Read all air data 
+    #<param> timeStr = table name </param>
+    #<return> sorted all air data </return>
+    def readAllAirData(self,timeStr):
         connection = sqlite3.connect('PM25.sqlite')
         queryStr="""SELECT AirInfo_{}.*, SiteInfo.stLatitude,
                     SiteInfo.stLongitude, SiteInfo.stNote 
@@ -56,3 +59,16 @@ class DBService:
         result = cursor.fetchall()
         
         return result
+    
+    #Read PM25 and PM10 by Id
+    #<return>one PM25 and PM10 </return>
+    def readPM25PM10(self,timeStr,Id):
+        connection = sqlite3.connect('PM25.sqlite')
+        queryStr = 'SELECT AirInfo_{}.PM25, AirInfo_{}.PM10 FROM AirInfo_{} \
+                      WHERE stId = "{}"'.format(timeStr,timeStr,timeStr,Id)
+        cursor = connection.execute(queryStr)
+        r_data = cursor.fetchall()
+        
+        return r_data
+        
+    
