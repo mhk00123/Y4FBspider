@@ -28,13 +28,18 @@ class dataAnaly:
     
     def getAreaAirInfo(self,timeStr):
          
-        self.neighbor_pm25pm10 = []
+        self.neighbor_pm25 = []
+        self.neighbor_pm10 = []
         for item in self.neighbor_gps:
-            temp = []
-            
+            temp25 = []
+            temp10 = []
             for i in item:
                 r_data = self.db.readPM25PM10(timeStr,i)
-                temp.append(r_data)
+                temp25.append(r_data[0][0])
+                temp10.append(r_data[0][1])
                 
-            self.neighbor_pm25pm10.append(temp)
-        return self.neighbor_pm25pm10
+            self.neighbor_pm25.append(temp25)
+            self.neighbor_pm10.append(temp10)
+        
+        print(type(r_data))
+        return self.neighbor_pm25,self.neighbor_pm10

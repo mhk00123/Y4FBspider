@@ -101,13 +101,11 @@ timeStr = time.strftime('%Y_%m_%d_%H_%M')                           #get current
 db.createAirData(timeStr,id_lst,pm25_lst,pm10_lst,t_lst,h_lst)      #Create AriInfo table
 data = db.readAllAirData(timeStr)                                      #Read AriInfo table
 
+
 #data analy instance
 analy = dataAnaly()
 analy.getAreaData(timeStr)
-x = analy.getAreaAirInfo(timeStr)
+x,y = analy.getAreaAirInfo(timeStr)        
 
-for item in x:
-    print(item)
 
-#analy.getAreaAirInfo(timeStr)
 #excel.outputExcel(id_lst,note_lst,pm25_lst,pm10_lst,t_lst,h_lst)
