@@ -11,6 +11,7 @@ from DBService import DBService         #DB class
 from bs4 import BeautifulSoup as bs     #html parse package
 from dataAnaly import dataAnaly         #data analy package
 import requests,time                    #html package , time package
+from FB import getInfo
 
 #=================================Method===================================#
 def urlService():
@@ -112,6 +113,9 @@ analy.avg_PM25()                                #cal near area average PM25
 analy.avg_PM10()                                #cal near area average PM10
 x = analy.grubbsTest()                          #cal final value
 
-for item in x:
-    print(item)
+for i in range(0,len(x)):
+    print('{}. {}'.format(i,x[i]))
+    
+fb = getInfo()
+fb.post_to_page(x[0])
 #excel.outputExcel(id_lst,note_lst,pm25_lst,pm10_lst,t_lst,h_lst)

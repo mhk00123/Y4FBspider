@@ -8,11 +8,12 @@ class dataAnaly:
         self.db = DBService()
         gps = []
         self.area_gps = []
-        
+        self.note = []
         r_data = self.db.readAllAirData(timeStr)
         
         for item in r_data:
-            gps.append([item[0],item[5],item[6]])
+            gps.append([item[0],item[5],item[6],item[7]])
+            self.note.append(item[7])
         
         #cal area point
         for i in gps:
@@ -49,7 +50,7 @@ class dataAnaly:
         self.s_pm25_lst = []
         for item in self.area_pm25:
             self.s_pm25_lst.append(np.std(item))
-    
+            
     #PM10 標準差
     def s_PM10(self):
         self.s_pm10_lst = []
@@ -72,20 +73,19 @@ class dataAnaly:
     def grubbsTest(self):
         
         self.area_final = []
+        index = 0                                       #item index
         for item in self.area_pm25:
-            count = 0
-            temp_area_gn = []
             An = self.db.selectGAlpha(len(item))
             x = str(An)[2:-3]
             if(x == ''):
                 x = float(0)
             else:
                 x = float(x)
-            for i in item:
-                Gn = abs((i - self.avg_pm25_lst[count])/self.s_pm25_lst[count])
-                final = Gn - x
-                temp_area_gn.append(final)
-            count += 1
-            self.area_final.append(temp_area_gn)
+            Gn = abs((item[0] - self.avg_pm25_lst[index])/self.s_pm25_lst[index])
+            final = x - Gn
+            if final < 0:
+                self.area_final.append(self.note[index])
+                
+            index += 1
             
         return self.area_final
