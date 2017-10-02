@@ -11,7 +11,7 @@ from DBService import DBService         #DB class
 from bs4 import BeautifulSoup as bs     #html parse package
 from dataAnaly import dataAnaly         #data analy package
 import requests,time                    #html package , time package
-from FB import getInfo
+#from FB import getInfo
 
 #=================================Method===================================#
 def urlService():
@@ -65,7 +65,7 @@ def getAirValue():
             h_lst.append(float(tempStr[:-3]))
 
 #==============================Main Programe===============================#
-'''
+
 #get all cols data from excel 
 excel = Service()
 all_id_lst = excel.getId()      #stId       
@@ -101,11 +101,11 @@ db=DBService()
 timeStr = time.strftime('%Y_%m_%d_%H_%M')                           #get current time
 db.createAirData(timeStr,id_lst,pm25_lst,pm10_lst,t_lst,h_lst)      #Create AriInfo table
 data = db.readAllAirData(timeStr)                                   #Read AriInfo table
-'''
+
 #data analy instance
 analy = dataAnaly()
-analy.getAreaData('2017_09_29_18_50')           #get near area 
-analy.getAreaAirInfo('2017_09_29_18_50')        #get near area air information
+analy.getAreaData(timeStr)           #get near area 
+analy.getAreaAirInfo(timeStr)        #get near area air information
 
 analy.s_PM25()                                  #cal near area air PM25 標準差 
 analy.s_PM10()                                  #cal near area air PM10 標準差
@@ -116,6 +116,6 @@ x = analy.grubbsTest()                          #cal final value
 for i in range(0,len(x)):
     print('{}. {}'.format(i,x[i]))
     
-fb = getInfo()
-fb.post_to_page(x[0])
+#fb = getInfo()
+#fb.post_to_page(x[0])
 #excel.outputExcel(id_lst,note_lst,pm25_lst,pm10_lst,t_lst,h_lst)
