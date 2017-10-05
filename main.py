@@ -28,7 +28,6 @@ def getAirValue():
         if i%4 == 3:
             h_lst.append(float(tempStr[:-3]))
 
-
 #==============================Main Programe===============================#
 db = DBService()
 data = Helper()
