@@ -8,48 +8,12 @@ Created on Sun Sep 24 17:06:34 2017
 
 from excelService import Service        #excel class
 from DBService import DBService         #DB class
-from bs4 import BeautifulSoup as bs     #html parse package
+from Helper import Helper               #data helper class
 from dataAnaly import dataAnaly         #data analy package
 import requests,time                    #html package , time package
 #from FB import getInfo
 
 #=================================Method===================================#
-def urlService():
-    #url handle
-    for Id in all_id_lst:
-        for sensor in sensor_lst:
-            #get url 
-            url = 'http://www.airq.org.tw/Home/GetCurrentValueApi?station={}&sensor={}'.format(Id,sensor)
-            #get html text
-            html = requests.get(url).text
-            parse = bs(html,'html.parser')
-            
-            #remove invalid id
-            if str(parse.find('title')).find('錯誤') == 7:
-                error_id_lst.append(Id)
-                continue
-            else:
-                url_lst.append(url)
-                id_lst.append(Id)
-
-def getUsefulValue():
-    # remove repeat id            
-    tempId=[]            
-    for idx in range(0,len(id_lst),4):
-        tempId.append(id_lst[idx])
-        
-    id_lst.clear()
-    for item in tempId:
-        id_lst.append(item)
-    
-    #get all useful info
-    for item in id_lst:
-        for idx in range(0,len(all_id_lst)):
-            if(item == all_id_lst[idx]):
-                note_lst.append(all_note_lst[idx])
-                lat_lst.append(all_lat_lst[idx])
-                lon_lst.append(all_lon_lst[idx])
-
 def getAirValue():
     
     for i in range(0,len(url_lst)):
@@ -65,27 +29,32 @@ def getAirValue():
             h_lst.append(float(tempStr[:-3]))
 
 #==============================Main Programe===============================#
-
-#get all cols data from excel 
+db = DBService()
+data = Helper()
 excel = Service()
+
+#sensor list
+sensor_lst = ['pm2.5','pm10','temperature','humidity']
+'''
+#the following execute at first time
+#get all cols data from excel
 all_id_lst = excel.getId()      #stId       
 all_lat_lst = excel.getLat()    #stLatitude
 all_lon_lst = excel.getLon()    #stLongitude
 all_note_lst = excel.getNote()  #stNote
 
-#sensor list
-sensor_lst = ['pm2.5','pm10','temperature','humidity']
+id_lst,url_lst = data.urlHelper(all_id_lst,sensor_lst) 
+lat_lst,lon_lst,note_lst = data.dataHelper(all_id_lst,all_lat_lst,
+                                           all_lon_lst,all_note_lst)
+db.createSiteData(id_lst,lat_lst,lon_lst,note_lst)
+'''
 
-error_id_lst = []               #error id list
-id_lst = []                     #useful stId list
-url_lst = []                    #useful url list
-lat_lst = []                    #useful latitude list
-lon_lst = []                    #useful longitude list
-note_lst = []                   #useful note list
-
-#Get all useful info
-urlService()
-getUsefulValue()
+#the following execute after the first time
+result = db.readSiteData()
+all_id_lst = []
+for item in result:
+    all_id_lst.append(item[0])
+id_lst,url_lst = data.urlHelper(all_id_lst,sensor_lst)
 
 #Air value lists
 pm25_lst = []                   #pm2.5 lsit
@@ -93,19 +62,15 @@ pm10_lst = []                   #pm10 list
 t_lst = []                      #temperatuer lsit
 h_lst = []                      #humidity list
 getAirValue()                   #get all air value
- 
-#database instance
-db=DBService()
-#db.createSiteData(id_lst,lat_lst,lon_lst,note_lst)
 
 timeStr = time.strftime('%Y_%m_%d_%H_%M')                           #get current time
 db.createAirData(timeStr,id_lst,pm25_lst,pm10_lst,t_lst,h_lst)      #Create AriInfo table
-data = db.readAllAirData(timeStr)                                   #Read AriInfo table
+data = db.readAreaData(timeStr)                                     #Read AriInfo table
 
 #data analy instance
 analy = dataAnaly()
-analy.getAreaData(timeStr)           #get near area 
-analy.getAreaAirInfo(timeStr)        #get near area air information
+y = analy.getAreaData(timeStr)                  #get near area 
+analy.getAreaAirInfo(timeStr)                   #get near area air information
 
 analy.s_PM25()                                  #cal near area air PM25 標準差 
 analy.s_PM10()                                  #cal near area air PM10 標準差
@@ -115,7 +80,7 @@ x = analy.grubbsTest()                          #cal final value
 
 for i in range(0,len(x)):
     print('{}. {}'.format(i,x[i]))
-    
+
 #fb = getInfo()
 #fb.post_to_page(x[0])
 #excel.outputExcel(id_lst,note_lst,pm25_lst,pm10_lst,t_lst,h_lst)

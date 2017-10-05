@@ -9,6 +9,11 @@ import sqlite3
 
 class DBService:
     
+    # <summary>Create site table</summary>
+    # <param name = "id_lst">   Site id list        </param>
+    # <param name = "lat_lst">  Site latitude list  </param>
+    # <param name = "lon_lst">  Site longitude list </param>
+    # <param name = "note_lst"> Site name list      </param>
     def createSiteData(self,id_lst,lat_lst,lon_lst,note_lst,):
         self.id_lst = id_lst
         self.lat_lst = lat_lst
@@ -16,13 +21,38 @@ class DBService:
         self.note_lst = note_lst
         connection = sqlite3.connect('PM25.sqlite')
         
+        #create site table
+        sqlStr = """create table if not exists SiteInfo(
+                    stId varchar primary key not null,
+                    stLatitude float,
+                    stLongitude float,
+                    stNote varchar)"""
+        connection.execute(sqlStr)
+        
         for i in range(0,len(id_lst)):
             sqlStr="insert into SiteInfo values('{}',{},{},'{}')".format(
                     self.id_lst[i],self.lat_lst[i],self.lon_lst[i],self.note_lst[i],)
             connection.execute(sqlStr)
         connection.commit()
         connection.close()
+    
+    # <summary>Read stie information</summary>
+    # <return>Site information</return>
+    def readSiteData(self):
+        queryStr = 'select SiteInfo.* from SiteInfo'
+        connection = sqlite3.connect('PM25.sqlite')
+        cursor = connection.execute(queryStr)
+        result = cursor.fetchall()
         
+        return result
+    
+    # <summary>create air table</summary>
+    # <param name = "timeStr">  table name             </param>
+    # <param name = "id_lst">   Site Id list           </param>
+    # <param name = "pm25_lst"> PM2.5 value list       </param>
+    # <param name = "pm10_lst"> PM10 value list        </param>
+    # <param name = "t_lst">    Temperature value list </param>
+    # <param name = "h_lst">    Humidity value list    </param>
     def createAirData(self,timeStr,id_lst,pm25_lst,pm10_lst,t_lst,h_lst):
         connection = sqlite3.connect('PM25.sqlite')
         sqlStr = """CREATE TABLE AirInfo_{} 
@@ -43,12 +73,12 @@ class DBService:
         connection.commit()
         connection.close()
     
-    #Read all air data 
-    #<param> timeStr = table name </param>
-    #<return> sorted all air data </return>
-    def readAllAirData(self,timeStr):
+    # <summary>Read all air data</summary> 
+    # <param name = "timeStr"> table name </param>
+    # <return> sorted all air data </return>
+    def readAreaData(self,timeStr):
         connection = sqlite3.connect('PM25.sqlite')
-        queryStr="""SELECT AirInfo_{}.*, SiteInfo.stLatitude,
+        queryStr="""SELECT AirInfo_{}.stId, SiteInfo.stLatitude,
                     SiteInfo.stLongitude, SiteInfo.stNote 
                     FROM AirInfo_{}, SiteInfo 
                     WHERE SiteInfo.stId = AirInfo_{}.stId
@@ -60,8 +90,10 @@ class DBService:
         
         return result
     
-    #Read PM25 and PM10 by Id
-    #<return>one PM25 and PM10 </return>
+    # <summary>Read PM25 and PM10 by Id</summary>
+    # <param name = "timeStsr">table name </param>
+    # <param name = "Id">      Site Id    </param>
+    # <return>one PM25 and PM10 </return>
     def readPM25PM10(self,timeStr,Id):
         connection = sqlite3.connect('PM25.sqlite')
         queryStr = 'SELECT AirInfo_{}.PM25, AirInfo_{}.PM10 FROM AirInfo_{} \
@@ -71,7 +103,9 @@ class DBService:
         
         return r_data
     
-    #select Ga    
+    # <summary>select Alpha n by Id</summary>
+    # <param name = "n"> 樣本數     </param>
+    # <return>Alpha n</return>
     def selectGAlpha(self,n):
         queryStr = 'select GrubbsTValue.alpha from GrubbsTValue where N = {}'.format(n)
         connection = sqlite3.connect('PM25.sqlite')
