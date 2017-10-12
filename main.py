@@ -63,13 +63,13 @@ t_lst = []                      #temperatuer lsit
 h_lst = []                      #humidity list
 getAirValue()                   #get all air value
 
-timeStr = time.strftime('%Y_%m_%d_%H_%M')                           #get current time
-db.createAirData(timeStr,id_lst,pm25_lst,pm10_lst,t_lst,h_lst)      #Create AriInfo table
-data = db.readAreaData(timeStr)                                     #Read AriInfo table
-
+timeStr = time.strftime('%Y_%m_%d_%H_%M')                         #get current time
+db.createAirData(timeStr,id_lst,pm25_lst,pm10_lst,t_lst,h_lst)    #Create AriInfo table
+#data = db.readAreaData(timeStr)                                   #Read AriInfo table
+'''
 #data analy instance
 analy = dataAnaly()
-y = analy.getAreaData(timeStr)                  #get near area 
+analy.getAreaData(timeStr)                      #get near area 
 analy.getAreaAirInfo(timeStr)                   #get near area air information
 
 analy.s_PM25()                                  #cal near area air PM25 標準差 
@@ -80,7 +80,7 @@ x = analy.grubbsTest()                          #cal final value
 
 for i in range(0,len(x)):
     print('{}. {}'.format(i,x[i]))
-
+'''
 #fb = getInfo()
 #fb.post_to_page(x[0])
 #excel.outputExcel(id_lst,note_lst,pm25_lst,pm10_lst,t_lst,h_lst)
