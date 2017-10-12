@@ -5,9 +5,24 @@ Created on Sun Sep 24 18:22:47 2017
 @author: user
 """
 
-import sqlite3
+import sqlite3,os
 
 class DBService:
+    
+    #2017-10-12 add by Mayday
+    def __init__(self):
+        self.path = os.path.dirname(__file__)
+    
+    #2017-10-12 add by Mayday
+    # <summary> Read all table name </summary>
+    # <return> All table name list </return>
+    def readAllTableName(self):
+        connection = sqlite3.connect(self.path + '/' + 'PM25.sqlite')
+        queryStr = '''SELECT type,name FROM sqlite_master WHERE type = "table"
+                      AND name LIKE "A%"'''
+        result = connection.execute(queryStr).fetchall()
+        
+        return result
     
     # <summary>Create site table</summary>
     # <param name = "id_lst">   Site id list        </param>
@@ -40,7 +55,7 @@ class DBService:
     # <return>Site information</return>
     def readSiteData(self):
         queryStr = 'select SiteInfo.* from SiteInfo'
-        connection = sqlite3.connect('PM25.sqlite')
+        connection = sqlite3.connect(self.path + '/' + 'PM25.sqlite')
         cursor = connection.execute(queryStr)
         result = cursor.fetchall()
         
@@ -54,7 +69,7 @@ class DBService:
     # <param name = "t_lst">    Temperature value list </param>
     # <param name = "h_lst">    Humidity value list    </param>
     def createAirData(self,timeStr,id_lst,pm25_lst,pm10_lst,t_lst,h_lst):
-        connection = sqlite3.connect('PM25.sqlite')
+        connection = sqlite3.connect(self.path + '/' + 'PM25.sqlite')
         sqlStr = """CREATE TABLE AirInfo_{} 
                     (stId VARCHAR NOT NULL,
                     PM25 INTEGER,
@@ -73,11 +88,40 @@ class DBService:
         connection.commit()
         connection.close()
     
-    # <summary>Read all air data</summary> 
+    # 2017-10-12 add by Mayday
+    # <summary>Read air data by station name </summary>
+    # <param name = "table_name"> Table name </param>
+    # <param name = "stNote"> Station name   </param>
+    # <return> Air data belonging to station name </return>
+    def readAirDataByNote(self,table_name,stNote):
+        connnection = sqlite3.connect(self.path + '/' + 'PM25.sqlite')
+        queryStr = """SELECT {}.* FROM {},SiteInfo
+                      WHERE SiteInfo.stId = {}.stId and SiteInfo.stNote = "{}"
+                   """.format(table_name,table_name,table_name,stNote)
+        cursor = connnection.execute(queryStr)
+        result = cursor.fetchone()
+        
+        return result
+    
+    # 2017-10-12 add by Mayday
+    # <summary> Read PM25 data by Id </summary>
+    # <param name ="table_name"> Table name </param>
+    # <param name ="Id"> Data Id </param>
+    # <teturn> one PM25 data belonging to id</return>
+    def readPM25ById(self,table_name,Id):
+        connection = sqlite3.connect(self.path + '/' + 'PM25.sqlite')
+        queryStr = 'SELECT stId,PM25 FROM {} WHERE stId = "{}"'.format(
+                table_name,Id)
+        cursor = connection.execute(queryStr)
+        result = cursor.fetchone()
+        
+        return result
+    
+    # <summary>Read all area data</summary> 
     # <param name = "timeStr"> table name </param>
-    # <return> sorted all air data </return>
+    # <return> sorted all area data </return>
     def readAreaData(self,timeStr):
-        connection = sqlite3.connect('PM25.sqlite')
+        connection = sqlite3.connect(self.path + '/' + 'PM25.sqlite')
         queryStr="""SELECT AirInfo_{}.stId, SiteInfo.stLatitude,
                     SiteInfo.stLongitude, SiteInfo.stNote 
                     FROM AirInfo_{}, SiteInfo 
@@ -95,7 +139,7 @@ class DBService:
     # <param name = "Id">      Site Id    </param>
     # <return>one PM25 and PM10 </return>
     def readPM25PM10(self,timeStr,Id):
-        connection = sqlite3.connect('PM25.sqlite')
+        connection = sqlite3.connect(self.path + '/' + 'PM25.sqlite')
         queryStr = 'SELECT AirInfo_{}.PM25, AirInfo_{}.PM10 FROM AirInfo_{} \
                       WHERE stId = "{}"'.format(timeStr,timeStr,timeStr,Id)
         cursor = connection.execute(queryStr)
@@ -108,7 +152,7 @@ class DBService:
     # <return>Alpha n</return>
     def selectGAlpha(self,n):
         queryStr = 'select GrubbsTValue.alpha from GrubbsTValue where N = {}'.format(n)
-        connection = sqlite3.connect('PM25.sqlite')
+        connection = sqlite3.connect(self.path + '/' + 'PM25.sqlite')
         cursor = connection.execute(queryStr)
         
         return cursor.fetchall()

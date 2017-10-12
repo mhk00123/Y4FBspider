@@ -10,6 +10,8 @@ import os
 
 class Service:
     
+    # <summary>Read site id from excel file</summary>
+    # <return>Site id list</return>
     def getId(self):
         self.path = os.path.dirname(__file__)
         self.excel = office.gencache.EnsureDispatch('Excel.Application')
@@ -26,6 +28,8 @@ class Service:
         #self.excel.Quit()
         return id_list
 
+    # <summary>Read site latitude from excel file</summary>
+    # <return>Site latitude list</return>
     def getLat(self):
         lat_lst=[]
         
@@ -36,6 +40,8 @@ class Service:
         #self.excel.Quit()
         return lat_lst
     
+    # <summary>Read site longitude from excel file</summary>
+    # <return>Site longitude list</return>
     def getLon(self):
         lon_lst=[]
         
@@ -46,6 +52,8 @@ class Service:
         #self.excel.Quit()
         return lon_lst
     
+    # <summary>Read site name from excel file</summary>
+    # <return>Site name list</return>
     def getNote(self):
         note_lst=[]
         
@@ -56,6 +64,13 @@ class Service:
         #self.excel.Quit()
         return note_lst
     
+    # <summary>Output site and air value to excel</summary>
+    # <param name = "id_lst">   Site id value list     </param>
+    # <param name = "note_lst"> Site name list         </param>
+    # <param name = "pm25_lst"> PM2.5 value list       </param>
+    # <param name = "pm10_lst"> PM10 value list        </param>
+    # <param name = "t_lst">    Temperature value list </param>
+    # <param name = "h_lst">    Humidity value list    </param>
     def outputExcel(self,id_lst,note_lst,pm25_lst,pm10_lst,t_lst,h_lst):
         self.ws = self.wb.Worksheets('數據')
         cols = ['A','B','C','D','E','F']
