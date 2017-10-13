@@ -16,8 +16,14 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MainWindow()
     
-    lst = [1,3,5,7]
-    window.listWidget.addItems(lst)
+    db = DBService()
+    x = db.readSiteData()
+    
+    site = []
+    for item in x:
+        site.append(item[3])
+    
+    window.listWidget.addItems(site)
     
     window.show()
 

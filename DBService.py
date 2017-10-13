@@ -117,6 +117,18 @@ class DBService:
         
         return result
     
+    # 2017-10-13 add by Mayday
+    # <summary> Get site note by site Id </summary>
+    # <param name = "Id"> site id </param>
+    # <return> Site note </return>
+    def readSiteNoteById(self,Id):
+        connnection = sqlite3.connect(self.path + '/' + 'PM25.sqlite')
+        queryStr = 'SELECT stNote FROM SiteInfo WHERE stId = "{}"'.format(Id)
+        cursor = connnection.execute(queryStr)
+        result = cursor.fetchone()
+        
+        return result 
+    
     # <summary>Read all area data</summary> 
     # <param name = "timeStr"> table name </param>
     # <return> sorted all area data </return>
