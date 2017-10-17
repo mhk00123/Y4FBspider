@@ -167,4 +167,4 @@ class DBService:
         connection = sqlite3.connect(self.path + '/' + 'PM25.sqlite')
         cursor = connection.execute(queryStr)
         
-        return cursor.fetchall()
+        return cursor.fetchone()

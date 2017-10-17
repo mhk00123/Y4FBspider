@@ -98,11 +98,12 @@ class dataAnaly:
         index = 0                                       #item index
         for item in self.area_pm25:
             An = self.db.selectGAlpha(len(item))        #Find alpha n
-            x = An[0][0]
-            Gn = abs((item[0] - self.avg_pm25_lst[index])/self.s_pm25_lst[index])
-            final = x - Gn
-            if (final < 0 and item[0] > 59):
-                self.area_final.append(self.note[index])
+            if An != None:
+                x = An[0]
+                Gn = abs((item[0] - self.avg_pm25_lst[index])/self.s_pm25_lst[index])
+                final = x - Gn
+                if (final < 0 and item[0] > 59):
+                    self.area_final.append(self.note[index])
             index += 1
             
         return self.area_final
